@@ -2,26 +2,26 @@ package com.example.seonyoung.my_application
 
 import android.content.DialogInterface
 import android.graphics.Color
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.LinearLayout
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import android.support.v7.app.AlertDialog
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.android.gms.tasks.OnCompleteListener
 
-class MainActivity : AppCompatActivity() {
+class SplashActivity : AppCompatActivity() {
 
     var linearLayout: LinearLayout? = null
     var mFirebaseRemoteConfig: FirebaseRemoteConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        Log.d("hi","hihi")
+        setContentView(R.layout.activity_splash)
+        Log.d("hi", "hihi")
 
-        linearLayout = findViewById(R.id.mainactivity_linearLayout)
+        linearLayout = findViewById(R.id.splashactivity_linearLayout)
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
         val configSettings = FirebaseRemoteConfigSettings.Builder()
                 .setDeveloperModeEnabled(BuildConfig.DEBUG)
@@ -44,15 +44,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun displayMessage() {
-        var main_background = mFirebaseRemoteConfig?.getString("splash_background")
+        var splash_background = mFirebaseRemoteConfig?.getString("splash_background")
         var caps = mFirebaseRemoteConfig?.getBoolean("splash_message_caps")
-        var main_message = mFirebaseRemoteConfig?.getString("splash_message")
+        var splash_message = mFirebaseRemoteConfig?.getString("splash_message")
 
-        linearLayout?.setBackgroundColor(Color.parseColor(main_background))
+        linearLayout?.setBackgroundColor(Color.parseColor(splash_background))
 
         if(caps!!){
             var builder : AlertDialog.Builder = AlertDialog.Builder(this)
-            builder.setMessage(main_message).setPositiveButton("확인", DialogInterface.OnClickListener { dialogInterface, i -> finish()  })
+            builder.setMessage(splash_message).setPositiveButton("확인", DialogInterface.OnClickListener { dialogInterface, i -> finish()  })
 
             builder.create().show()
         }
