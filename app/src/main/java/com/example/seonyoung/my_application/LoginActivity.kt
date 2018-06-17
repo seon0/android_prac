@@ -10,8 +10,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 
 class LoginActivity : AppCompatActivity() {
 
-    var login :Button? = null
-    var signin :Button? = null
+    val login by lazy { findViewById<Button>(R.id.loginActivity_button_login) }
+    val signin by lazy { findViewById<Button>(R.id.loginActivity_button_sign) }
     var mFirebaseRemoteConfig: FirebaseRemoteConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,10 +24,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
 
-        login = findViewById(R.id.loginActivity_button_login)
-        signin = findViewById(R.id.loginActivity_button_sign)
-        login?.setBackgroundColor(Color.parseColor(splash_background))
-        signin?.setBackgroundColor(Color.parseColor(splash_background))
+        login.setBackgroundColor(Color.parseColor(splash_background))
+        signin.setBackgroundColor(Color.parseColor(splash_background))
 
 
     }
