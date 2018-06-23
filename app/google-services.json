@@ -15,14 +15,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "212328495784-0pr3o1ceq8a90j8ht3on2da257v3bk5a.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.seonyoung.my_application",
-            "certificate_hash": "b7225ad9cce320eead1466b898a998936c89191c"
-          }
-        },
-        {
           "client_id": "212328495784-mg9ladagn7jhgmif3bj3kmj98quic18u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -31,8 +23,20 @@
           }
         },
         {
-          "client_id": "212328495784-had01lht5u1a74dkk5r131cge7pfo93c.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "212328495784-0pr3o1ceq8a90j8ht3on2da257v3bk5a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.seonyoung.my_application",
+            "certificate_hash": "b7225ad9cce320eead1466b898a998936c89191c"
+          }
+        },
+        {
+          "client_id": "212328495784-h9ei76u8qt5s30q58jm0lk8i4gkjspa1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.seonyoung.my_application",
+            "certificate_hash": "817a8dde66cba40e69cc51cc7f2bfddf6180eb49"
+          }
         },
         {
           "client_id": "212328495784-had01lht5u1a74dkk5r131cge7pfo93c.apps.googleusercontent.com",
@@ -77,10 +81,6 @@
             "package_name": "com.example.sport0102.myapplication",
             "certificate_hash": "04b0605f40ddbe810f348571047d0b75e986a0ea"
           }
-        },
-        {
-          "client_id": "212328495784-had01lht5u1a74dkk5r131cge7pfo93c.apps.googleusercontent.com",
-          "client_type": 3
         },
         {
           "client_id": "212328495784-had01lht5u1a74dkk5r131cge7pfo93c.apps.googleusercontent.com",
