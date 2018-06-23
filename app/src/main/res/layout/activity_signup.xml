@@ -10,7 +10,7 @@
     android:orientation="vertical">
 
     <ImageView
-        android:src="@drawble/baseline_add_to_photos_black_48dp.png"
+        android:src="@drawable/baseline_add_to_photos_black_48"
         android:id="@+id/singupActivity_imageview_profile"
         android:layout_width="100dp"
         android:layout_height="100dp"
