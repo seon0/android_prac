@@ -7,6 +7,7 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -25,7 +26,7 @@ class SignupActivity : AppCompatActivity() {
     val password by lazy { findViewById<EditText>(R.id.signupActivity_edittext_password) }
     val signup by lazy { findViewById<Button>(R.id.signupActivity_button_signup) }
     val profile by lazy { findViewById<ImageView>(R.id.singupActivity_imageview_profile) }
-    lateinit var imageUri: Uri
+    var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,9 +51,9 @@ class SignupActivity : AppCompatActivity() {
                     .createUserWithEmailAndPassword(email.text.toString(), password.text.toString())
                     .addOnCompleteListener(this@SignupActivity, OnCompleteListener {
                         var uid :String = it.getResult().user.uid
-                        FirebaseStorage.getInstance().getReference().child("userImages").child(uid).putFile(imageUri).addOnCompleteListener {
-                            val imageUrl: String = it.getResult().downloadUrl.toString()
+                        FirebaseStorage.getInstance().getReference().child("userImages").child(uid).putFile(imageUri!!).addOnCompleteListener {
 
+                            val imageUrl: String = it.getResult().downloadUrl.toString()
                             var userModel: UserModel = UserModel()
                             userModel.userName = name.text.toString()
                             userModel.profileImageUrl = imageUrl
