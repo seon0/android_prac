@@ -43,7 +43,7 @@ class SignupActivity : AppCompatActivity() {
         }
 
         signup.setOnClickListener {
-            if (email.text.toString() == null || name.text.toString() == null || password.text.toString() == null) {
+            if (email.text.toString() == null || name.text.toString() == null || password.text.toString() == null || imageUri==null) {
                 return@setOnClickListener
             }
 
@@ -58,7 +58,9 @@ class SignupActivity : AppCompatActivity() {
                             userModel.userName = name.text.toString()
                             userModel.profileImageUrl = imageUrl
 
-                            FirebaseDatabase.getInstance().getReference().child("users").child(uid).setValue(userModel)
+                            FirebaseDatabase.getInstance().getReference().child("users").child(uid).setValue(userModel).addOnSuccessListener {
+                                this@SignupActivity.finish()
+                            }
                         }
                     })
 
