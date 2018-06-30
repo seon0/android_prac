@@ -57,6 +57,7 @@ class SignupActivity : AppCompatActivity() {
                             var userModel: UserModel = UserModel()
                             userModel.userName = name.text.toString()
                             userModel.profileImageUrl = imageUrl
+                            userModel.uid = FirebaseAuth.getInstance().currentUser!!.uid
 
                             FirebaseDatabase.getInstance().getReference().child("users").child(uid).setValue(userModel).addOnSuccessListener {
                                 this@SignupActivity.finish()

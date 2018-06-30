@@ -47,6 +47,7 @@ class PeopleFragment : Fragment() {
             customView.textView.setText(userModels.get(position).userName)
             holder.itemView.setOnClickListener {
                 var intent: Intent = Intent(it.context, MessageActivity::class.java)
+                intent.putExtra("destinationUid", userModels.get(position).uid)
                 var activityOptions: ActivityOptions? = ActivityOptions.makeCustomAnimation(it.context, R.anim.fromright, R.anim.toleft)
                 startActivity(it.context,intent,activityOptions!!.toBundle())
 
