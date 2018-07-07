@@ -18,6 +18,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.seonyoung.my_application.R
 import com.example.seonyoung.my_application.chat.MessageActivity
 import com.example.seonyoung.my_application.model.UserModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -63,11 +64,18 @@ class PeopleFragment : Fragment() {
                 override fun onCancelled(p0: DatabaseError) {
 
                 }
+                val myUid :String = FirebaseAuth.getInstance().currentUser!!.uid
 
                 override fun onDataChange(p0: DataSnapshot) {
                     userModels.clear()
+
                     p0.children.forEach {
+                        var userModel :UserModel = it.getValue(UserModel::class.java)!!;
                         userModels.add(it.getValue(UserModel::class.java)!!)
+
+                        if(userModel.uid.equals(myUid)){
+                            return@forEach
+                        }
                     }
                     notifyDataSetChanged()
 
