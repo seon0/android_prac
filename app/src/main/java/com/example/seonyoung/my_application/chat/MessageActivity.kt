@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,7 +56,9 @@ class MessageActivity : AppCompatActivity() {
                 }
             } else {
                 val comment: Companion.Comment = Companion.Comment(uid, editText.text.toString())
-                FirebaseDatabase.getInstance().getReference().child("chatrooms").child(chatRoomUid!!).child("comments").push().setValue(comment)
+                FirebaseDatabase.getInstance().getReference().child("chatrooms").child(chatRoomUid!!).child("comments").push().setValue(comment).addOnCompleteListener {
+                    editText.setText("")
+                }
             }
 
         }
@@ -113,7 +116,10 @@ class MessageActivity : AppCompatActivity() {
                     p0.children.forEach {
                         comments.add(it.getValue(ChatModel.Companion.Comment::class.java)!!)
                     }
+                    //메세지가 갱신
                     notifyDataSetChanged()
+
+                    recyclerView.scrollToPosition(comments.size-1)
                 }
 
             })
@@ -132,19 +138,23 @@ class MessageActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             var messageViewHolder: MessageViewHolder = (holder as MessageViewHolder)
 
+            //내가 보냔메세지
             if (comments.get(position).uid.equals(uid)) {
                 messageViewHolder.textView_message.text = comments.get(position).message
                 messageViewHolder.textView_message.setBackgroundResource(R.drawable.rightbubble)
                 messageViewHolder.linearLayout_destination.visibility = View.INVISIBLE
                 messageViewHolder.textView_message.setTextSize(25f)
-
-            } else {
+                messageViewHolder.linearLayout_main.gravity=Gravity.RIGHT
+            }
+            //상대방이 보낸 매세지
+            else {
                 Glide.with(holder.itemView.context).load(userModel!!.profileImageUrl).apply(RequestOptions().circleCrop()).into(messageViewHolder.iamgeView_profile)
                 messageViewHolder.textview_name.setText(userModel!!.userName)
                 messageViewHolder.linearLayout_destination.visibility = View.VISIBLE
                 messageViewHolder.textView_message.setBackgroundResource(R.drawable.leftbubble)
                 messageViewHolder.textView_message.setText(comments.get(position).message)
                 messageViewHolder.textView_message.setTextSize(25f)
+                messageViewHolder.linearLayout_main.gravity = Gravity.LEFT
             }
         }
 
@@ -153,6 +163,7 @@ class MessageActivity : AppCompatActivity() {
             var textview_name: TextView = view.findViewById(R.id.messageItem_textview_name)
             var iamgeView_profile: ImageView = view.findViewById(R.id.messageItem_imageview_profile)
             var linearLayout_destination: LinearLayout = view.findViewById(R.id.messageItem_linearlayout_destination)
+            var linearLayout_main : LinearLayout = view.findViewById(R.id.messageItem_linearlayout_main)
 
         }
 
