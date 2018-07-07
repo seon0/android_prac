@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +52,6 @@ class PeopleFragment : Fragment() {
                 intent.putExtra("destinationUid", userModels.get(position).uid)
                 var activityOptions: ActivityOptions? = ActivityOptions.makeCustomAnimation(it.context, R.anim.fromright, R.anim.toleft)
                 startActivity(it.context,intent,activityOptions!!.toBundle())
-
             }
         }
 
@@ -71,11 +71,11 @@ class PeopleFragment : Fragment() {
 
                     p0.children.forEach {
                         var userModel :UserModel = it.getValue(UserModel::class.java)!!;
-                        userModels.add(it.getValue(UserModel::class.java)!!)
 
                         if(userModel.uid.equals(myUid)){
                             return@forEach
                         }
+                        userModels.add(it.getValue(UserModel::class.java)!!)
                     }
                     notifyDataSetChanged()
 

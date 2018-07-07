@@ -1,4 +1,5 @@
 package com.example.seonyoung.my_application.chat
+
 import android.util.Log
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -7,18 +8,21 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.GlideContext
+import com.bumptech.glide.request.RequestOptions
 import com.example.seonyoung.my_application.R
 import com.example.seonyoung.my_application.model.ChatModel
 import com.example.seonyoung.my_application.model.ChatModel.Companion
+import com.example.seonyoung.my_application.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_message.*
+import org.w3c.dom.Text
 
 class MessageActivity : AppCompatActivity() {
 
@@ -36,6 +40,7 @@ class MessageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
+        checkChatRoom()
         button.setOnClickListener {
             var users: HashMap<String, Boolean> = HashMap()
             var comments: HashMap<String, Companion.Comment> = HashMap()
@@ -78,9 +83,26 @@ class MessageActivity : AppCompatActivity() {
     }
 
     inner class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        var comments = ArrayList<Companion.Comment>()
+        var comments : ArrayList<Companion.Comment>
+        lateinit var userModel: UserModel
 
         init {
+
+            comments = ArrayList<Companion.Comment>()
+            FirebaseDatabase.getInstance().getReference().child("users").child(destinationUid).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+
+                }
+
+                override fun onDataChange(p0: DataSnapshot) {
+                    userModel = p0.getValue(UserModel::class.java)!!
+                    getMessageList()
+                }
+
+            })
+        }
+
+        fun getMessageList() {
             FirebaseDatabase.getInstance().getReference().child("chatrooms").child(chatRoomUid!!).child("comments").addValueEventListener(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
 
@@ -108,11 +130,30 @@ class MessageActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            (holder as MessageViewHolder).textView_message.text = comments.get(position).message
+            var messageViewHolder: MessageViewHolder = (holder as MessageViewHolder)
+
+            if (comments.get(position).uid.equals(uid)) {
+                messageViewHolder.textView_message.text = comments.get(position).message
+                messageViewHolder.textView_message.setBackgroundResource(R.drawable.rightbubble)
+                messageViewHolder.linearLayout_destination.visibility = View.INVISIBLE
+                messageViewHolder.textView_message.setTextSize(25f)
+
+            } else {
+                Glide.with(holder.itemView.context).load(userModel!!.profileImageUrl).apply(RequestOptions().circleCrop()).into(messageViewHolder.iamgeView_profile)
+                messageViewHolder.textview_name.setText(userModel!!.userName)
+                messageViewHolder.linearLayout_destination.visibility = View.VISIBLE
+                messageViewHolder.textView_message.setBackgroundResource(R.drawable.leftbubble)
+                messageViewHolder.textView_message.setText(comments.get(position).message)
+                messageViewHolder.textView_message.setTextSize(25f)
+            }
         }
 
         inner class MessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             var textView_message: TextView = view.findViewById(R.id.messageItem_textView_message)
+            var textview_name: TextView = view.findViewById(R.id.messageItem_textview_name)
+            var iamgeView_profile: ImageView = view.findViewById(R.id.messageItem_imageview_profile)
+            var linearLayout_destination: LinearLayout = view.findViewById(R.id.messageItem_linearlayout_destination)
+
         }
 
     }
