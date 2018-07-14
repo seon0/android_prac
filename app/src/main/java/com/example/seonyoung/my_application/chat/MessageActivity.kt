@@ -16,11 +16,15 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.seonyoung.my_application.R
 import com.example.seonyoung.my_application.model.ChatModel
 import com.example.seonyoung.my_application.model.ChatModel.Companion
+import com.example.seonyoung.my_application.model.NotificationModel
 import com.example.seonyoung.my_application.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_message.*
+import okhttp3.*
 import org.w3c.dom.Text
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,6 +42,7 @@ class MessageActivity : AppCompatActivity() {
     var simpleDateFormat : SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
 
     //val tag = "MessageActivity"
+    lateinit var destinationUserModel: UserModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +63,7 @@ class MessageActivity : AppCompatActivity() {
             } else {
                 val comment: Companion.Comment = Companion.Comment(uid, editText.text.toString(), ServerValue.TIMESTAMP)
                 FirebaseDatabase.getInstance().getReference().child("chatrooms").child(chatRoomUid!!).child("comments").push().setValue(comment).addOnCompleteListener {
+                    sendGcm()
                     editText.setText("")
                 }
             }
@@ -65,6 +71,31 @@ class MessageActivity : AppCompatActivity() {
         }
     }
 
+    fun sendGcm(){
+        var gson : Gson = Gson()
+
+        var sendNotification : NotificationModel.Companion.Notification = NotificationModel.Companion.Notification("보낸이 아이디", editText.text.toString())
+        var notificationModel : NotificationModel = NotificationModel(destinationUserModel.pushToken, sendNotification)
+
+        var requestBody : RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf8"), gson.toJson(notificationModel))
+
+        var request : Request = Request.Builder()
+                .header("Content-Type", "application/json")
+                .addHeader("Authorization", "key=AIzaSyC2vr58VfsUByFLQ1wQTtgEeYN9inN_ypo")
+                .url("https://gcm-http.googleapis.com/gcm/send")
+                .post(requestBody)
+                .build()
+        var okHTTPClient : OkHttpClient = OkHttpClient()
+        okHTTPClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call?, e: IOException?) {
+                Log.d("OKHTTPPPPPPPP","faillllll")
+            }
+
+            override fun onResponse(call: Call?, response: Response?) {
+                Log.d("OKHTTPPPPPPPP","okokokok")
+            }
+        })
+    }
     fun checkChatRoom() {
         FirebaseDatabase.getInstance().getReference().child("chatrooms").orderByChild("users/"+uid).equalTo(true).addListenerForSingleValueEvent(object : ValueEventListener {
 
@@ -88,7 +119,6 @@ class MessageActivity : AppCompatActivity() {
 
     inner class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         var comments : ArrayList<Companion.Comment>
-        lateinit var userModel: UserModel
 
         init {
 
@@ -99,7 +129,7 @@ class MessageActivity : AppCompatActivity() {
                 }
 
                 override fun onDataChange(p0: DataSnapshot) {
-                    userModel = p0.getValue(UserModel::class.java)!!
+                    destinationUserModel = p0.getValue(UserModel::class.java)!!
                     getMessageList()
                 }
 
@@ -149,8 +179,8 @@ class MessageActivity : AppCompatActivity() {
             }
             //상대방이 보낸 매세지
             else {
-                Glide.with(holder.itemView.context).load(userModel!!.profileImageUrl).apply(RequestOptions().circleCrop()).into(messageViewHolder.iamgeView_profile)
-                messageViewHolder.textview_name.setText(userModel!!.userName)
+                Glide.with(holder.itemView.context).load(destinationUserModel!!.profileImageUrl).apply(RequestOptions().circleCrop()).into(messageViewHolder.iamgeView_profile)
+                messageViewHolder.textview_name.setText(destinationUserModel!!.userName)
                 messageViewHolder.linearLayout_destination.visibility = View.VISIBLE
                 messageViewHolder.textView_message.setBackgroundResource(R.drawable.leftbubble)
                 messageViewHolder.textView_message.setText(comments.get(position).message)
