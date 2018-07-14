@@ -7,6 +7,9 @@ import android.support.design.widget.BottomNavigationView
 import android.view.MenuItem
 import com.example.seonyoung.my_application.fragment.ChatFragment
 import com.example.seonyoung.my_application.fragment.PeopleFragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.iid.FirebaseInstanceId
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,9 +31,16 @@ class MainActivity : AppCompatActivity() {
                 }
                 return false
             }
-
         })
+        passPushTokenToServer()
+    }
 
+    fun passPushTokenToServer(){
+        var uid : String = FirebaseAuth.getInstance().currentUser!!.uid
+        var token : String = FirebaseInstanceId.getInstance().getToken()!!
+        var map : HashMap<String, Any> = HashMap()
+        map.put("pushToken", token)
 
+        FirebaseDatabase.getInstance().getReference().child("users").child(uid).updateChildren(map)
     }
 }
