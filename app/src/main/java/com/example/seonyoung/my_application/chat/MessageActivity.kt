@@ -66,7 +66,7 @@ class MessageActivity : AppCompatActivity() {
     }
 
     fun checkChatRoom() {
-        FirebaseDatabase.getInstance().getReference().child("chatrooms").orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(object : ValueEventListener {
+        FirebaseDatabase.getInstance().getReference().child("chatrooms").orderByChild("users/"+uid).equalTo(true).addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onCancelled(p0: DatabaseError) {
             }
@@ -174,5 +174,10 @@ class MessageActivity : AppCompatActivity() {
 
         }
 
+    }
+
+    override fun onBackPressed() {
+        finish()
+        overridePendingTransition(R.anim.fromleft, R.anim.toright)
     }
 }

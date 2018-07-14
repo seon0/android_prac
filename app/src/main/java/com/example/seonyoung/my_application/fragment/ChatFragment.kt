@@ -1,9 +1,12 @@
 package com.example.seonyoung.my_application.fragment
 
+import android.app.ActivityOptions
 import android.app.Fragment
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +15,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.seonyoung.my_application.R
+import com.example.seonyoung.my_application.chat.MessageActivity
 import com.example.seonyoung.my_application.model.ChatModel
 import com.example.seonyoung.my_application.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
@@ -19,9 +23,14 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ChatFragment :Fragment(){
+
+    var simpleDateFormat : SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm")
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         var view : View = inflater!!.inflate(R.layout.fragment_chat, container, false)
         var recyclerView : RecyclerView = view.findViewById(R.id.chatfragment_recyclerview)
@@ -34,10 +43,11 @@ class ChatFragment :Fragment(){
     inner class ChatRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
         var chatModels : ArrayList<ChatModel> = ArrayList()
         lateinit var uid :String
+        var destinationUsers : ArrayList<String> = ArrayList()
 
         init {
             uid = FirebaseAuth.getInstance().currentUser!!.uid
-            FirebaseDatabase.getInstance().getReference("chatrooms").orderByChild("users/"+uid).addListenerForSingleValueEvent(object :ValueEventListener{
+            FirebaseDatabase.getInstance().getReference("chatrooms").orderByChild("users/"+uid).equalTo(true).addListenerForSingleValueEvent(object :ValueEventListener{
                 override fun onCancelled(p0: DatabaseError) {
                 }
 
@@ -62,11 +72,13 @@ class ChatFragment :Fragment(){
             lateinit var imageView : ImageView
             lateinit var textView_title : TextView
             lateinit var textView_last_message : TextView
+            lateinit var textView_timestamp : TextView
 
             init {
                 imageView = view.findViewById(R.id.chatitem_imageview)
                 textView_title= view.findViewById(R.id.chatitem_textview_title)
                 textView_last_message = view.findViewById(R.id.chatitem_textview_lastMessage)
+                textView_timestamp = view.findViewById(R.id.chatitem_textview_timestamp)
             }
 
 
@@ -85,6 +97,7 @@ class ChatFragment :Fragment(){
             chatModels.get(position).users!!.keys.forEach {
                 if( it!=uid ){
                     destinationUid = it
+                    destinationUsers.add(destinationUid!!)
                 }
             }
             FirebaseDatabase.getInstance().getReference().child("users").child(destinationUid!!).addListenerForSingleValueEvent(object : ValueEventListener{
@@ -102,6 +115,20 @@ class ChatFragment :Fragment(){
             commentMap.putAll(chatModels.get(position).comments!!)
             var lastMessageKey:String = commentMap.keys.toTypedArray()[0]
             customViewHolder.textView_last_message.setText(chatModels.get(position).comments!!.get(lastMessageKey)!!.message)
+
+            customViewHolder.itemView.setOnClickListener(View.OnClickListener {
+                var intent : Intent = Intent(view.context, MessageActivity::class.java)
+                intent.putExtra("destinationUid", destinationUsers.get(position))
+
+                var activitiOptions :ActivityOptions = ActivityOptions.makeCustomAnimation(view.context, R.anim.fromright, R.anim.toleft)
+                startActivity(intent, activitiOptions.toBundle())
+            })
+
+            //TimeStamp
+            simpleDateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+            var unixTime = chatModels.get(position).comments!!.get(lastMessageKey)!!.timestamp.toString().toLong()
+            var date : Date = Date(unixTime)
+            customViewHolder.textView_timestamp.setText(simpleDateFormat.format(date))
         }
 
     }
