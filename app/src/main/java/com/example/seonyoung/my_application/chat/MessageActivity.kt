@@ -18,12 +18,11 @@ import com.example.seonyoung.my_application.model.ChatModel
 import com.example.seonyoung.my_application.model.ChatModel.Companion
 import com.example.seonyoung.my_application.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_message.*
 import org.w3c.dom.Text
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MessageActivity : AppCompatActivity() {
 
@@ -35,6 +34,8 @@ class MessageActivity : AppCompatActivity() {
     var chatRoomUid: String? = null
 
     val recyclerView: RecyclerView by lazy { findViewById<RecyclerView>(R.id.messageActivity_recyclerview) }
+
+    var simpleDateFormat : SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
 
     //val tag = "MessageActivity"
 
@@ -55,7 +56,7 @@ class MessageActivity : AppCompatActivity() {
                     checkChatRoom()
                 }
             } else {
-                val comment: Companion.Comment = Companion.Comment(uid, editText.text.toString())
+                val comment: Companion.Comment = Companion.Comment(uid, editText.text.toString(), ServerValue.TIMESTAMP)
                 FirebaseDatabase.getInstance().getReference().child("chatrooms").child(chatRoomUid!!).child("comments").push().setValue(comment).addOnCompleteListener {
                     editText.setText("")
                 }
@@ -156,6 +157,11 @@ class MessageActivity : AppCompatActivity() {
                 messageViewHolder.textView_message.setTextSize(25f)
                 messageViewHolder.linearLayout_main.gravity = Gravity.LEFT
             }
+            var unixTime = comments.get(position).timestamp.toString().toLong()
+            var date : Date = Date(unixTime)
+            simpleDateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+            var time :String = simpleDateFormat.format(date)
+            messageViewHolder.testView_timestamp.setText(time)
         }
 
         inner class MessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -164,6 +170,7 @@ class MessageActivity : AppCompatActivity() {
             var iamgeView_profile: ImageView = view.findViewById(R.id.messageItem_imageview_profile)
             var linearLayout_destination: LinearLayout = view.findViewById(R.id.messageItem_linearlayout_destination)
             var linearLayout_main : LinearLayout = view.findViewById(R.id.messageItem_linearlayout_main)
+            var testView_timestamp : TextView = view.findViewById(R.id.messageItem_textView_timestamp)
 
         }
 
